@@ -10,6 +10,14 @@ function ECHOJSON($data) {
     exit;
 }
 
+// Đường dẫn để lưu script Python
+$localScriptPath = '/var/www/html/script.py';  // Thay đổi đường dẫn theo cấu trúc thư mục của bạn
+
+// Tải script từ GitHub
+$scriptUrl = 'https://raw.githubusercontent.com/Sumula924k/botphpsms/main/script.py';
+$scriptContent = file_get_contents($scriptUrl);
+file_put_contents($localScriptPath, $scriptContent);
+
 // Kiểm tra giá trị 'count' trong yêu cầu GET
 if (isset($_GET["count"]) && $_GET["count"] > 0) {
     $count = (int)$_GET["count"];
@@ -19,7 +27,6 @@ if (isset($_GET["count"]) && $_GET["count"] > 0) {
         ECHOJSON(array("status" => "error", "msg" => "Count 3 = Max nha"));
     }
 
-    // Log thông tin sdt và count
     if (isset($_GET["sdt"])) {
         $sdt = $_GET["sdt"];
     } else if (isset($_POST["sdt"])) {
@@ -30,9 +37,10 @@ if (isset($_GET["count"]) && $_GET["count"] > 0) {
 
     // Kiểm tra sdt không hợp lệ
     if (in_array($sdt, ["113", "114", "115", "911"])) {
-        ECHOJSON(array("status" => "error", "msg" => "spam so nay con me may a` ???"));
+        ECHOJSON(array("status" => "error", "msg" => "Số điện thoại không hợp lệ"));
     }
 
+    // Ghi log thông tin
     error_log("sdt = " . $sdt . " count = " . $count . " Accepted");
 
     // Kiểm tra độ dài số điện thoại
@@ -41,12 +49,9 @@ if (isset($_GET["count"]) && $_GET["count"] > 0) {
     } else if (!$sdt) {
         ECHOJSON(array("status" => "error", "msg" => "Vui Lòng Nhập Đúng Số SDT"));
     } else {
-        // Đường dẫn tuyệt đối đến script.py trên Replit
-        $scriptPath = __DIR__ . '/script.py';
-        
         // Chạy script Python
-        $command = escapeshellcmd("python3 $scriptPath {$sdt} {$count}");
-        $output = shell_exec($command);
+        $command = escapeshellcmd("python3 $localScriptPath {$sdt} {$count}");
+        $output = shell_exec($command . ' 2>&1');  // Ghi lại lỗi vào đầu ra
 
         // Kiểm tra xem lệnh có chạy thành công hay không
         if ($output === null) {
