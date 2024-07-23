@@ -42,7 +42,7 @@ if (isset($_GET["count"]) && $_GET["count"] > 0) {
         ECHOJSON(array("status" => "error", "msg" => "Vui Lòng Nhập Đúng Số SDT"));
     } else {
         // Đường dẫn tuyệt đối đến script.py trên Replit
-        $scriptPath = "/home/runner/th1nksms/script.py";
+        $scriptPath = __DIR__ . '/script.py';
         
         // Chạy script Python
         $command = escapeshellcmd("python3 $scriptPath {$sdt} {$count}");
