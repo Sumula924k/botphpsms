@@ -10,14 +10,6 @@ function ECHOJSON($data) {
     exit;
 }
 
-// Đường dẫn để lưu script Python
-$localScriptPath = '/var/www/html/script.py';  // Thay đổi đường dẫn theo cấu trúc thư mục của bạn
-
-// Tải script từ GitHub
-$scriptUrl = 'https://raw.githubusercontent.com/Sumula924k/botphpsms/main/script.py';
-$scriptContent = file_get_contents($scriptUrl);
-file_put_contents($localScriptPath, $scriptContent);
-
 // Kiểm tra giá trị 'count' trong yêu cầu GET
 if (isset($_GET["count"]) && $_GET["count"] > 0) {
     $count = (int)$_GET["count"];
@@ -49,9 +41,12 @@ if (isset($_GET["count"]) && $_GET["count"] > 0) {
     } else if (!$sdt) {
         ECHOJSON(array("status" => "error", "msg" => "Vui Lòng Nhập Đúng Số SDT"));
     } else {
+        // Đường dẫn tương đối đến script.py
+        $scriptPath = __DIR__ . '/script.py';
+        
         // Chạy script Python
-        $command = escapeshellcmd("python3 $localScriptPath {$sdt} {$count}");
-        $output = shell_exec($command . ' 2>&1');  // Ghi lại lỗi vào đầu ra
+        $command = escapeshellcmd("python3 $scriptPath {$sdt} {$count}");
+        $output = shell_exec($command);
 
         // Kiểm tra xem lệnh có chạy thành công hay không
         if ($output === null) {
